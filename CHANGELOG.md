@@ -2,15 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
-and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## [2.9.2] - 2021-05-21
+### Fixed
+Fixed issue where `IUserPresence` objects were not being deserialized properly by the client as part
+of the `IParty` object.
+
+## [2.9.1] - 2021-05-19
+### Added
+- The `Socket.ReceivedParty` event can now be subscribed to in order to listen for acceptance events
+from the leader of a closed party.
+
+## [2.9.0] - 2021-05-15
 ### Added
 - A session can be refreshed on demand with "SessionRefreshAsync" method.
 - Session and/or refresh tokens can now be disabled with a client logout.
 - The client now supports session auto-refresh using refresh tokens. This is enabled by default.
 - New socket RPC and MatchSend methods using ArraySegment to allow developers to manage memory re-use.
+- Add IAP validation APIs for purchase receipts with Apple App Store, Google Play Store, and Huawei AppGallery.
+- Add Realtime Parties feature.
+
+### Changed
+- Use lock object with socket operations instead of ConcurrentDictionary as a workaround for a Unity engine WebGL regression.
+- Avoid use of extension methods as a workaround for a Unity engine WebGL regression.
+
+### Fixed
+- Parse HTTP responses defensively in case of bad load balancer configurations.
 
 ## [2.8.0] - 2020-02-19
 ### Changed

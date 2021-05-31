@@ -13,32 +13,22 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 
 namespace Nakama
 {
     /// <summary>
-    /// Receive status updates for users.
+    /// Incoming notification for one or more new presences attempting to join the party.
     /// </summary>
-    public interface IStatus
+    public interface IPartyJoinRequest
     {
         /// <summary>
-        /// The status events for the users followed.
+        /// The ID of the party to get a list of join requests for.
+        /// </summary>
+        string PartyId { get; }
+
+        /// <summary>
+        /// Presences attempting to join, or who have joined.
         /// </summary>
         IEnumerable<IUserPresence> Presences { get; }
-    }
-
-    /// <inheritdoc cref="IStatus"/>
-    internal class Status : IStatus
-    {
-        public IEnumerable<IUserPresence> Presences => PresencesField ?? UserPresence.NoPresences;
-        [DataMember(Name="presences"), Preserve]
-        public List<UserPresence> PresencesField { get; set; }
-
-        public override string ToString()
-        {
-            var presences = string.Join(", ", Presences);
-            return $"Status(Presences=[{presences}])";
-        }
     }
 }
