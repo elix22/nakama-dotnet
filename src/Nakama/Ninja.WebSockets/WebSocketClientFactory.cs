@@ -46,6 +46,8 @@ namespace Nakama.Ninja.WebSockets
         private readonly Func<MemoryStream> _bufferFactory;
         private readonly IBufferPool _bufferPool;
 
+        private RemoteCertificateValidationCallback _remoteCertificateValidationCallback = null;
+
         /// <summary>
         /// Initialises a new instance of the WebSocketClientFactory class without caring about internal buffers
         /// </summary>
@@ -53,6 +55,7 @@ namespace Nakama.Ninja.WebSockets
         {
             _bufferPool = new BufferPool();
             _bufferFactory = _bufferPool.GetBuffer;
+            _remoteCertificateValidationCallback = null;
         }
 
         /// <summary>
@@ -62,7 +65,16 @@ namespace Nakama.Ninja.WebSockets
         public WebSocketClientFactory(Func<MemoryStream> bufferFactory)
         {
             _bufferFactory = bufferFactory;
+            _remoteCertificateValidationCallback = null;
         }
+
+        public WebSocketClientFactory(RemoteCertificateValidationCallback remoteCertificateValidationCallback)
+        {
+            _bufferPool = new BufferPool();
+            _bufferFactory = _bufferPool.GetBuffer;
+            _remoteCertificateValidationCallback = remoteCertificateValidationCallback;
+        }
+
 
         /// <summary>
         /// Connect with default options
@@ -239,7 +251,17 @@ namespace Nakama.Ninja.WebSockets
 
             if (isSecure)
             {
-                SslStream sslStream = new SslStream(stream, false, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
+
+                
+                SslStream sslStream = null;
+                if (_remoteCertificateValidationCallback != null)
+                {
+                    sslStream = new SslStream(stream, false, new RemoteCertificateValidationCallback(_remoteCertificateValidationCallback), null);
+                }
+                else
+                {
+                    sslStream = new SslStream(stream, false, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
+                }
 
                 // This will throw an AuthenticationException if the certificate is not valid
                 TlsAuthenticateAsClient(sslStream, host);

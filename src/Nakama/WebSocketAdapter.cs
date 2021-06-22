@@ -17,6 +17,7 @@
 using System;
 using System.Net.Sockets;
 using System.Net.WebSockets;
+using System.Net.Security;
 using System.Threading;
 using System.Threading.Tasks;
 using Nakama.Ninja.WebSockets;
@@ -59,8 +60,9 @@ namespace Nakama
         private CancellationTokenSource _cancellationSource;
         private WebSocket _webSocket;
         private Uri _uri;
+        private RemoteCertificateValidationCallback _remoteCertificateValidationCallback = null;
 
-        public WebSocketAdapter(int keepAliveIntervalSec = KeepAliveIntervalSec, int sendTimeoutSec = SendTimeoutSec) :
+        public WebSocketAdapter(RemoteCertificateValidationCallback remoteCertificateValidationCallback = null,int keepAliveIntervalSec = KeepAliveIntervalSec, int sendTimeoutSec = SendTimeoutSec) :
             this(new WebSocketClientOptions
             {
                 IncludeExceptionInCloseResponse = true,
@@ -68,7 +70,10 @@ namespace Nakama
                 NoDelay = true
             }, sendTimeoutSec)
         {
+            _remoteCertificateValidationCallback = remoteCertificateValidationCallback;
         }
+
+       
 
         public WebSocketAdapter(WebSocketClientOptions options, int sendTimeoutSec)
         {
@@ -101,7 +106,7 @@ namespace Nakama
             _uri = uri;
             IsConnecting = true;
 
-            var clientFactory = new WebSocketClientFactory();
+            var clientFactory = (_remoteCertificateValidationCallback != null)? new WebSocketClientFactory(_remoteCertificateValidationCallback) : new WebSocketClientFactory();
             try
             {
                 var cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeout));

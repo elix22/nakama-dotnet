@@ -19,6 +19,7 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Nakama.TinyJson;
+using System.Net.Security;
 
 namespace Nakama
 {
@@ -753,6 +754,9 @@ namespace Nakama
         /// <param name="client">A client object.</param>
         /// <returns>A new socket with the connection settings from the client.</returns>
         public static ISocket From(IClient client) => From(client, new WebSocketAdapter());
+
+        //remoteCertificateValidationCallback
+        public static ISocket From(IClient client, RemoteCertificateValidationCallback remoteCertificateValidationCallback) => From(client, new WebSocketAdapter(remoteCertificateValidationCallback));
 
         /// <summary>
         /// Build a socket from a client object and socket adapter.
