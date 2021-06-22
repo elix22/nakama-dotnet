@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace Nakama
 {
-    internal class GZipHttpClientHandler : DelegatingHandler
+    public class GZipHttpClientHandler : DelegatingHandler
     {
         public GZipHttpClientHandler(HttpMessageHandler innerHandler)
         {
