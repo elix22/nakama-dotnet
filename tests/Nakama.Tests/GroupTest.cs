@@ -33,7 +33,7 @@ namespace Nakama.Tests.Api
             _socket = Nakama.Socket.From(_client);
         }
 
-        [Fact]
+        [Fact(Timeout = TestsUtil.TIMEOUT_MILLISECONDS)]
         public async Task ShouldCreateGroup()
         {
             var session = await _client.AuthenticateCustomAsync($"{Guid.NewGuid()}");
@@ -57,7 +57,7 @@ namespace Nakama.Tests.Api
             Assert.Equal(open, group.Open);
         }
 
-        [Fact]
+        [Fact(Timeout = TestsUtil.TIMEOUT_MILLISECONDS)]
         public async Task ShouldCreateGroupDefault()
         {
             var session = await _client.AuthenticateCustomAsync($"{Guid.NewGuid()}");
@@ -76,7 +76,7 @@ namespace Nakama.Tests.Api
             Assert.Equal(name, group.Name);
         }
 
-        [Fact]
+        [Fact(Timeout = TestsUtil.TIMEOUT_MILLISECONDS)]
         public async Task ShouldNotCreateGroup()
         {
             var session = await _client.AuthenticateCustomAsync($"{Guid.NewGuid()}");
@@ -88,7 +88,7 @@ namespace Nakama.Tests.Api
             Assert.Equal((int) HttpStatusCode.Conflict, ex.StatusCode);
         }
 
-        [Fact]
+        [Fact(Timeout = TestsUtil.TIMEOUT_MILLISECONDS)]
         public async Task ShouldListGroups()
         {
             var session = await _client.AuthenticateCustomAsync($"{Guid.NewGuid()}");
@@ -101,7 +101,7 @@ namespace Nakama.Tests.Api
             Assert.NotEmpty(result.Groups);
         }
 
-        [Fact]
+        [Fact(Timeout = TestsUtil.TIMEOUT_MILLISECONDS)]
         public async Task ShouldListGroupsNameFilter()
         {
             var session = await _client.AuthenticateCustomAsync($"{Guid.NewGuid()}");
@@ -115,7 +115,7 @@ namespace Nakama.Tests.Api
             Assert.True(result.Groups.Count(g => name.Equals(g.Name)) == 1);
         }
 
-        [Fact]
+        [Fact(Timeout = TestsUtil.TIMEOUT_MILLISECONDS)]
         public async Task ShouldListGroupsFilterTwo()
         {
             var session = await _client.AuthenticateCustomAsync($"{Guid.NewGuid()}");
@@ -133,7 +133,7 @@ namespace Nakama.Tests.Api
             Assert.True(result.Groups.Count(g => name1.Equals(g.Name) || name2.Equals(g.Name)) == 2);
         }
 
-        [Fact]
+        [Fact(Timeout = TestsUtil.TIMEOUT_MILLISECONDS)]
         public async Task ShouldListGroupsCursor()
         {
             var session = await _client.AuthenticateCustomAsync($"{Guid.NewGuid()}");
@@ -150,7 +150,7 @@ namespace Nakama.Tests.Api
             Assert.True(result.Groups.Count() >= 1);
         }
 
-        [Fact]
+        [Fact(Timeout = TestsUtil.TIMEOUT_MILLISECONDS)]
         public async Task ShouldDeleteGroup()
         {
             var session = await _client.AuthenticateCustomAsync($"{Guid.NewGuid()}");
@@ -168,7 +168,7 @@ namespace Nakama.Tests.Api
             Assert.Empty(result2.UserGroups);
         }
 
-        [Fact]
+        [Fact(Timeout = TestsUtil.TIMEOUT_MILLISECONDS)]
         public async Task ShouldDeleteGroupInvalid()
         {
             var session = await _client.AuthenticateCustomAsync($"{Guid.NewGuid()}");
@@ -178,7 +178,7 @@ namespace Nakama.Tests.Api
             Assert.Equal((int) HttpStatusCode.BadRequest, ex.StatusCode);
         }
 
-        [Fact]
+        [Fact(Timeout = TestsUtil.TIMEOUT_MILLISECONDS)]
         public async Task ShouldNotDeleteGroupNotSuperAdmin()
         {
             var session1 = await _client.AuthenticateCustomAsync($"{Guid.NewGuid()}");
@@ -189,7 +189,7 @@ namespace Nakama.Tests.Api
             Assert.Equal((int) HttpStatusCode.BadRequest, ex.StatusCode);
         }
 
-        [Fact]
+        [Fact(Timeout = TestsUtil.TIMEOUT_MILLISECONDS)]
         public async Task ShouldPromoteAndDemoteUsers()
         {
             var session1 = await _client.AuthenticateCustomAsync($"{Guid.NewGuid()}");
@@ -203,18 +203,18 @@ namespace Nakama.Tests.Api
 
             var admins = await _client.ListGroupUsersAsync(session1, group.Id, state: 1, limit: 2);
 
-            Assert.Equal(admins.GroupUsers.Count(), 2);
+            Assert.Equal(2, admins.GroupUsers.Count());
 
             await _client.DemoteGroupUsersAsync(session1, group.Id, new string[]{session2.UserId, session3.UserId});
 
             admins = await _client.ListGroupUsersAsync(session1, group.Id, state: 1, limit: 2);
-            Assert.Equal(admins.GroupUsers.Count(), 0);
+            Assert.Empty(admins.GroupUsers);
 
             var members = await _client.ListGroupUsersAsync(session1, group.Id, state: 2, limit: 2);
-            Assert.Equal(members.GroupUsers.Count(), 2);
+            Assert.Equal(2, members.GroupUsers.Count());
         }
 
-        [Fact]
+        [Fact(Timeout = TestsUtil.TIMEOUT_MILLISECONDS)]
         public async Task ShouldBanUsers()
         {
             var session1 = await _client.AuthenticateCustomAsync($"{Guid.NewGuid()}");
@@ -227,7 +227,7 @@ namespace Nakama.Tests.Api
             await _client.BanGroupUsersAsync(session1, group.Id, new []{session2.UserId, session3.UserId});
 
             var remainingMembers = await _client.ListGroupUsersAsync(session1, group.Id, state: null, limit: 100);
-            Assert.Equal(remainingMembers.GroupUsers.Count(), 1);
+            Assert.Single(remainingMembers.GroupUsers);
         }
 
     }
