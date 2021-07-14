@@ -213,7 +213,7 @@ namespace Nakama
         }
 
         /// <inheritdoc cref="AddMatchmakerPartyAsync"/>
-        public Task AddMatchmakerPartyAsync(string partyId, string query, int minCount, int maxCount, Dictionary<string, string> stringProperties = null, Dictionary<string, double> numericProperties = null)
+        public async Task<IPartyMatchmakerTicket> AddMatchmakerPartyAsync(string partyId, string query, int minCount, int maxCount, Dictionary<string, string> stringProperties = null, Dictionary<string, double> numericProperties = null)
         {
             var envelope = new WebSocketMessageEnvelope
             {
@@ -229,7 +229,8 @@ namespace Nakama
                 }
             };
 
-            return SendAsync(envelope);
+            var response = await SendAsync(envelope);
+            return response.PartyMatchmakerTicket;
         }
 
         /// <inheritdoc cref="CloseAsync"/>
@@ -241,7 +242,7 @@ namespace Nakama
 
         /// <inheritdoc cref="ConnectAsync"/>
         public Task ConnectAsync(ISession session, bool appearOnline = false,
-            int connectTimeoutSec = DefaultConnectTimeout)
+            int connectTimeoutSec = DefaultConnectTimeout, string langTag = "en")
         {
             var tcs = new TaskCompletionSource<bool>();
             Action callback = () => tcs.TrySetResult(true);
@@ -251,7 +252,7 @@ namespace Nakama
             var uri = new UriBuilder(_baseUri)
             {
                 Path = "/ws",
-                Query = $"lang=en&status={appearOnline}&token={session.AuthToken}"
+                Query = $"lang={langTag}&status={appearOnline}&token={session.AuthToken}"
             }.Uri;
             tcs.Task.ContinueWith(_ =>
             {
@@ -473,8 +474,8 @@ namespace Nakama
             return response.PartyJoinRequest;
         }
 
-        /// <inheritdoc cref="PromotePartyMember"/>
-        public Task PromotePartyMember(string partyId, IUserPresence partyMember)
+        /// <inheritdoc cref="PromotePartyMemberAsync"/>
+        public Task PromotePartyMemberAsync(string partyId, IUserPresence partyMember)
         {
             var envelope = new WebSocketMessageEnvelope
             {
